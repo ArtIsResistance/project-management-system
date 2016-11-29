@@ -9,8 +9,10 @@ public class Project {
     private Date completionDate;
     private int completionHours;
     protected ProjectManager manager;
+    private Company company;
 
-    public Project(String name, Date creationDate, Date completionDate, int completionHours, ProjectManager manager) {
+    public Project(String name, Date creationDate, Date completionDate, int completionHours, ProjectManager manager,
+                   Company company) {
         this.name = name;
         this.creationDate = creationDate;
         this.completionDate = completionDate;
@@ -18,6 +20,7 @@ public class Project {
         this.manager = manager;
         manager.setProject(this);
         this.employees = new HashSet<>();
+        this.company = company;
     }
 
     public int getCompletionHours() {
@@ -45,6 +48,8 @@ public class Project {
     }
 
     public void assignEmployee(Employee emp) {
+        if (!company.getEmployees().contains(emp))
+            throw new RuntimeException("Employee doesn't belong to this company");
         employees.add(emp);
     }
 
@@ -95,6 +100,8 @@ public class Project {
             return false;
         if (completionDate != null ? !completionDate.equals(project.completionDate) : project.completionDate != null)
             return false;
+        if (company != null ? !company.equals(project.company) : project.company != null)
+            return false;
         return manager != null ? manager.equals(project.manager) : project.manager == null;
     }
 
@@ -105,6 +112,7 @@ public class Project {
         result = 31 * result + (creationDate != null ? creationDate.hashCode() : 0);
         result = 31 * result + (completionDate != null ? completionDate.hashCode() : 0);
         result = 31 * result + completionHours;
+        result = 31 * result + (company != null ? company.hashCode() : 0);
         result = 31 * result + (manager != null ? manager.hashCode() : 0);
         return result;
     }

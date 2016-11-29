@@ -25,7 +25,7 @@ public class Main {
         Employee emp3 = new Employee("Jack", "Nicholson", df.parse("01/08/1960"), 14);
 
         Project pms = new Project("pms", df.parse("10/27/2016"), df.parse("01/01/2017"), 30,
-                new ProjectManager());
+                new ProjectManager(), company);
         pms.assignEmployee(emp);
         pms.assignEmployee(emp2);
         pms.assignEmployee(emp3);

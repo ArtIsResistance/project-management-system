@@ -2,7 +2,7 @@ package com.mpt.pms.domain;
 
 import java.util.*;
 
-public class Employee {
+public class Employee extends ModelBase{
     protected static int workHours = 8;
 
     private String firstName;

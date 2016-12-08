@@ -1,8 +1,11 @@
 package com.mpt.pms.domain;
 
+import com.mpt.pms.domain.exceptions.AssignmentException;
+import com.mpt.pms.domain.exceptions.TaskAssignmentException;
+
 import java.util.*;
 
-public class ProjectManager {
+public class ProjectManager extends ModelBase {
     private Project project;
     private Map<Employee, List<Task>> createdTasks;
 
@@ -30,19 +33,19 @@ public class ProjectManager {
         return assignedHours;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Project project) throws AssignmentException{
         if (!createdTasks.isEmpty())
-            throw new RuntimeException("Project already has tasks");
+            throw new AssignmentException("Project already has tasks");
         this.project = project;
     }
 
-    public void assignTask(NotAssignedTask task, Employee employee) {
+    public void assignTask(NotAssignedTask task, Employee employee) throws TaskAssignmentException {
         if (!project.getEmployees().contains(employee))
-            throw new RuntimeException("Project not have this employee");
+            throw new TaskAssignmentException("Project not have this employee");
 
         ProjectTask assignedTask = new ProjectTask(task, employee, project);
         if (!employee.canTakeTask(task))
-            throw new RuntimeException("Employee is out of time");
+            throw new TaskAssignmentException("Employee is out of time");
 
         if (createdTasks.containsKey(employee)) {
             createdTasks.get(employee).add(assignedTask);
@@ -55,7 +58,7 @@ public class ProjectManager {
         }
     }
 
-    public void assignTask(NotAssignedTask task) {
+    public void assignTask(NotAssignedTask task) throws TaskAssignmentException{
         List<Employee> freeEmployees = project.getFreeEmployees();
         if (freeEmployees.size() == 0) return;
 

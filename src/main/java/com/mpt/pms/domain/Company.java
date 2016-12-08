@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class Company {
+public class Company extends ModelBase{
     private String name;
     private Date foundationDate;
     private List<Project> projects;

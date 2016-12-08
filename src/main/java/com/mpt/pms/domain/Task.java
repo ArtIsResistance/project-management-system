@@ -1,6 +1,6 @@
 package com.mpt.pms.domain;
 
-public abstract class Task {
+public abstract class Task extends ModelBase{
     private String description;
     protected int hours;
 

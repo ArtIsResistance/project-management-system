@@ -57,7 +57,9 @@ public class ProjectManager {
 
     public void assignTask(NotAssignedTask task) {
         List<Employee> freeEmployees = project.getFreeEmployees();
-        if (freeEmployees.size() == 0) return;
+        if (freeEmployees.size() == 0) {
+            throw new RuntimeException("No free employees found for this project");
+        }
 
         assignTask(task, freeEmployees.get(0));
     }

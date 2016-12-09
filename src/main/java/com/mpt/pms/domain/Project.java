@@ -1,8 +1,11 @@
 package com.mpt.pms.domain;
 
+import com.mpt.pms.domain.exceptions.AssignmentException;
+import com.mpt.pms.domain.exceptions.EmployeeAssignmentException;
+
 import java.util.*;
 
-public class Project {
+public class Project extends ModelBase{
     private String name;
     private Set<Employee> employees;
     private Date creationDate;
@@ -12,7 +15,7 @@ public class Project {
     private Company company;
 
     public Project(String name, Date creationDate, Date completionDate, int completionHours, ProjectManager manager,
-                   Company company) {
+                   Company company) throws AssignmentException {
         this.name = name;
         this.creationDate = creationDate;
         this.completionDate = completionDate;
@@ -47,9 +50,9 @@ public class Project {
         return completionDate;
     }
 
-    public void assignEmployee(Employee emp) {
+    public void assignEmployee(Employee emp) throws EmployeeAssignmentException {
         if (!company.getEmployees().contains(emp))
-            throw new RuntimeException("Employee doesn't belong to this company");
+            throw new EmployeeAssignmentException("Employee doesn't belong to this company");
         employees.add(emp);
     }
 

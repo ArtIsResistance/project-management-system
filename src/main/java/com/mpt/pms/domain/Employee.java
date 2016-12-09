@@ -1,22 +1,21 @@
 package com.mpt.pms.domain;
 
+import java.time.LocalDate;
 import java.util.*;
 
-public class Employee extends ModelBase{
+public class Employee extends ModelBase {
     protected static int workHours = 8;
 
     private String firstName;
     private String lastName;
-    private Date birthDate;
-    protected int experienceYears;
-    private Set<ProjectTask> tasks;
+    private LocalDate birthDate;
+    private Map<LocalDate, List<ProjectTask>> tasks;
 
-    public Employee(String firstName, String lastName, Date birthDate, int experienceYears) {
+    public Employee(String firstName, String lastName, LocalDate birthDate) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthDate = birthDate;
-        this.experienceYears = experienceYears;
-        tasks = new HashSet<>();
+        tasks = new HashMap<>();
     }
 
     public String getFirstName() {
@@ -35,55 +34,68 @@ public class Employee extends ModelBase{
         this.lastName = lastName;
     }
 
-    public Date getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Date birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 
-    public int getExperienceYears() {
-        return experienceYears;
-    }
-
-    public Set<ProjectTask> getProjectTasks() {
-        return Collections.unmodifiableSet(tasks);
+    public Map<LocalDate, List<ProjectTask>> getProjectTasks() {
+        return Collections.unmodifiableMap(tasks);
     }
 
     public boolean canTakeTask(Task t) {
-        return freeHours() >= t.getHours();
+        return freeHours(t.getExecutionDate()) >= t.getHours();
     }
 
     public void takeTask(ProjectTask t) {
-        tasks.add(t);
+        if (tasks.containsKey(t.getExecutionDate())) {
+            tasks.get(t.getExecutionDate()).add(t);
+            return;
+        }
+
+        ArrayList<ProjectTask> newProjectTasks = new ArrayList<>();
+        newProjectTasks.add(t);
+        tasks.put(t.getExecutionDate(), newProjectTasks);
     }
 
     public List<Project> getProjects() {
         Set<Project> projects = new HashSet<Project>();
-        for (ProjectTask t : tasks) {
-            projects.add(t.getProject());
+
+        for (List<ProjectTask> projTasks : tasks.values()) {
+            for (ProjectTask t : projTasks) {
+                projects.add(t.getProject());
+            }
         }
 
         return new ArrayList<>(projects);
     }
 
     public void leaveProject(Project project) {
-        boolean result = tasks.removeIf(t -> t.getProject().equals(project));
-
-        if (project.getEmployees().contains(this))
-            project.removeEmployee(this);
-    }
-
-    public int freeHours() {
-        int assignedHours = 0;
-        for (ProjectTask t : tasks) {
-            if (!t.isFinished())
-                assignedHours += t.getHours();
+        for (List<ProjectTask> dailyTasks : tasks.values()) {
+            dailyTasks.removeIf(t -> t.getProject().equals(project));
         }
 
+        ProjectManager pm = project.getProjectManager();
+        if (pm.getEmployees().contains(this))
+            pm.removeEmployee(this);
+    }
+
+    public int freeHours(LocalDate date) {
+        int assignedHours = 0;
+
+        List<ProjectTask> dailyTasks = tasks.get(date);
+        if (dailyTasks != null) {
+            for (ProjectTask t : dailyTasks) {
+                if (!t.isFinished())
+                    assignedHours += t.getHours();
+            }
+        }
         return workHours - assignedHours;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -92,7 +104,6 @@ public class Employee extends ModelBase{
 
         Employee employee = (Employee) o;
 
-        if (experienceYears != employee.experienceYears) return false;
         if (firstName != null ? !firstName.equals(employee.firstName) : employee.firstName != null) return false;
         if (lastName != null ? !lastName.equals(employee.lastName) : employee.lastName != null) return false;
         return birthDate != null ? birthDate.equals(employee.birthDate) : employee.birthDate == null;
@@ -103,7 +114,6 @@ public class Employee extends ModelBase{
         int result = firstName != null ? firstName.hashCode() : 0;
         result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
         result = 31 * result + (birthDate != null ? birthDate.hashCode() : 0);
-        result = 31 * result + experienceYears;
         return result;
     }
 
@@ -113,7 +123,6 @@ public class Employee extends ModelBase{
                 "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", birthDate=" + birthDate +
-                ", experienceYears=" + experienceYears +
                 '}';
     }
 }

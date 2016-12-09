@@ -3,26 +3,22 @@ package com.mpt.pms.domain;
 import com.mpt.pms.domain.exceptions.AssignmentException;
 import com.mpt.pms.domain.exceptions.EmployeeAssignmentException;
 
+import java.time.LocalDate;
 import java.util.*;
 
-public class Project extends ModelBase{
+public class Project extends ModelBase {
     private String name;
-    private Set<Employee> employees;
-    private Date creationDate;
-    private Date completionDate;
+    private LocalDate creationDate;
+    private LocalDate completionDate;
     private int completionHours;
-    protected ProjectManager manager;
     private Company company;
 
-    public Project(String name, Date creationDate, Date completionDate, int completionHours, ProjectManager manager,
+    public Project(String name, LocalDate creationDate, LocalDate completionDate, int completionHours,
                    Company company) throws AssignmentException {
         this.name = name;
         this.creationDate = creationDate;
         this.completionDate = completionDate;
         this.completionHours = completionHours;
-        this.manager = manager;
-        manager.setProject(this);
-        this.employees = new HashSet<>();
         this.company = company;
     }
 
@@ -30,63 +26,22 @@ public class Project extends ModelBase{
         return completionHours;
     }
 
-    public Set<Employee> getEmployees() {
-        return Collections.unmodifiableSet(employees);
-    }
-
-    public ProjectManager getManager() {
-        return manager;
-    }
+    public Company getCompany() { return company; }
 
     public String getName() {
         return name;
     }
 
-    public Date getCreationDate() {
+    public LocalDate getCreationDate() {
         return creationDate;
     }
 
-    public Date getCompletionDate() {
+    public LocalDate getCompletionDate() {
         return completionDate;
     }
 
-    public void assignEmployee(Employee emp) throws EmployeeAssignmentException {
-        if (!company.getEmployees().contains(emp))
-            throw new EmployeeAssignmentException("Employee doesn't belong to this company");
-        employees.add(emp);
-    }
-
-    public boolean removeEmployee(Employee emp) {
-        if (emp.getProjects().contains(this))
-            emp.leaveProject(this);
-
-        if (manager.removeEmployeeTasks(emp) && employees.remove(emp)) {
-            return true;
-        }
-        return false;
-    }
-
-    public List<Employee> getFreeEmployees() {
-        List<Employee> emps = new ArrayList<>();
-        for (Employee e : employees) {
-            if (e.freeHours() > 0) {
-                emps.add(e);
-            }
-        }
-
-        Collections.sort(emps, (x, y) -> -(x.freeHours() - y.freeHours()));
-        return emps;
-    }
-
-    public boolean canProjectBeFinished() {
-        int assignedHours = manager.getAssignedHours();
-        int freeHours = 0;
-
-        for (Employee emp : employees) {
-            freeHours += emp.freeHours();
-        }
-
-        return completionHours <= assignedHours + freeHours;
+    public ProjectManager getProjectManager() {
+        return company.getProjectManager(this);
     }
 
     @Override
@@ -98,25 +53,20 @@ public class Project extends ModelBase{
 
         if (completionHours != project.completionHours) return false;
         if (name != null ? !name.equals(project.name) : project.name != null) return false;
-        if (employees != null ? !employees.equals(project.employees) : project.employees != null) return false;
         if (creationDate != null ? !creationDate.equals(project.creationDate) : project.creationDate != null)
             return false;
         if (completionDate != null ? !completionDate.equals(project.completionDate) : project.completionDate != null)
             return false;
-        if (company != null ? !company.equals(project.company) : project.company != null)
-            return false;
-        return manager != null ? manager.equals(project.manager) : project.manager == null;
+        return company != null ? !company.equals(project.company) : project.company != null;
     }
 
     @Override
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (employees != null ? employees.hashCode() : 0);
         result = 31 * result + (creationDate != null ? creationDate.hashCode() : 0);
         result = 31 * result + (completionDate != null ? completionDate.hashCode() : 0);
         result = 31 * result + completionHours;
         result = 31 * result + (company != null ? company.hashCode() : 0);
-        result = 31 * result + (manager != null ? manager.hashCode() : 0);
         return result;
     }
 
@@ -124,11 +74,9 @@ public class Project extends ModelBase{
     public String toString() {
         return "Project{" +
                 "name='" + name + '\'' +
-                ", employees=" + employees +
                 ", creationDate=" + creationDate +
                 ", completionDate=" + completionDate +
                 ", completionHours=" + completionHours +
-                ", manager=" + manager +
                 '}';
     }
 }

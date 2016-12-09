@@ -1,21 +1,20 @@
 package com.mpt.pms.domain;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import com.mpt.pms.domain.exceptions.AssignmentException;
+
+import java.util.*;
 
 public class Company extends ModelBase{
     private String name;
     private Date foundationDate;
-    private List<Project> projects;
     private List<Employee> employees;
+    private HashMap<Project, ProjectManager> projectManagers;
 
     public Company(String name, Date foundationDate) {
         this.name = name;
         this.foundationDate = foundationDate;
-        projects = new ArrayList<>();
         employees = new ArrayList<>();
+        projectManagers = new HashMap<>();
     }
 
     public String getName() {
@@ -26,8 +25,22 @@ public class Company extends ModelBase{
         return foundationDate;
     }
 
-    public List<Project> getProjects() {
-        return Collections.unmodifiableList(projects);
+    public void assignProjectManager(Project project, ProjectManager manager) throws AssignmentException {
+        if (!employees.contains(manager)) {
+            throw new AssignmentException(String.format("Company '%s' doesn't have PM '%s %s'",
+                                                        name,
+                                                        manager.getFirstName(),
+                                                        manager.getLastName()));
+        }
+        if (projectManagers.containsKey(project)) {
+            throw new AssignmentException(String.format("Project '%s' already assigned", project.getName()));
+        }
+        manager.changeProject(project);
+        projectManagers.put(project, manager);
+    }
+
+    public ProjectManager getProjectManager(Project project) {
+        return projectManagers.get(project);
     }
 
     public List<Employee> getEmployees() {
@@ -57,7 +70,6 @@ public class Company extends ModelBase{
         if (name != null ? !name.equals(company.name) : company.name != null) return false;
         if (foundationDate != null ? !foundationDate.equals(company.foundationDate) : company.foundationDate != null)
             return false;
-        if (projects != null ? !projects.equals(company.projects) : company.projects != null) return false;
         return employees != null ? employees.equals(company.employees) : company.employees == null;
     }
 
@@ -65,7 +77,6 @@ public class Company extends ModelBase{
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (foundationDate != null ? foundationDate.hashCode() : 0);
-        result = 31 * result + (projects != null ? projects.hashCode() : 0);
         result = 31 * result + (employees != null ? employees.hashCode() : 0);
         return result;
     }
@@ -75,7 +86,6 @@ public class Company extends ModelBase{
         return "Company{" +
                 "name='" + name + '\'' +
                 ", foundationDate=" + foundationDate +
-                ", projects=" + projects +
                 ", employees=" + employees +
                 '}';
     }

@@ -1,18 +1,21 @@
 package com.mpt.pms.domain;
 
+import java.time.LocalDate;
+import java.util.Calendar;
+
 public class ProjectTask extends Task {
     private Employee employee;
     private Project project;
     private boolean isFinished;
 
-    public ProjectTask(String description, Employee employee, Project project, int hours) {
-        super(description, hours);
+    public ProjectTask(String description, Employee employee, Project project, int hours, LocalDate executionDate) {
+        super(description, hours, executionDate);
         this.employee = employee;
         this.project = project;
     }
 
     public ProjectTask(Task task, Employee employee, Project project) {
-        super(task.getDescription(), task.getHours());
+        super(task.getDescription(), task.getHours(), task.getExecutionDate());
         this.employee = employee;
         this.project = project;
     }

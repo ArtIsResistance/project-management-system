@@ -1,12 +1,20 @@
 package com.mpt.pms.domain;
 
+import java.time.LocalDate;
+
 public abstract class Task extends ModelBase{
     private String description;
+    private LocalDate executionDate;
     protected int hours;
 
     public Task(String description, int hours) {
+        this(description, hours, LocalDate.now());
+    }
+
+    public Task(String description, int hours, LocalDate executionDate) {
         this.description = description;
         this.hours = hours;
+        this.executionDate = executionDate;
     }
 
     public String getDescription() {
@@ -43,5 +51,9 @@ public abstract class Task extends ModelBase{
                 "description='" + description + '\'' +
                 ", hours=" + hours +
                 '}';
+    }
+
+    public LocalDate getExecutionDate() {
+        return executionDate;
     }
 }

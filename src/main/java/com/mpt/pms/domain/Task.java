@@ -1,8 +1,9 @@
 package com.mpt.pms.domain;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public abstract class Task extends ModelBase{
+public abstract class Task implements Serializable {
     private String description;
     private LocalDate executionDate;
     protected int hours;

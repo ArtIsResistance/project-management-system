@@ -1,12 +1,11 @@
 package com.mpt.pms.domain;
 
 import com.mpt.pms.domain.exceptions.AssignmentException;
-import com.mpt.pms.domain.exceptions.EmployeeAssignmentException;
 
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.*;
 
-public class Project extends ModelBase {
+public class Project implements Serializable {
     private String name;
     private LocalDate creationDate;
     private LocalDate completionDate;

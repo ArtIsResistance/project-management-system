@@ -1,9 +1,10 @@
 package com.mpt.pms.domain;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 
-public class Employee extends ModelBase {
+public class Employee implements Serializable {
     protected static int workHours = 8;
 
     private String firstName;

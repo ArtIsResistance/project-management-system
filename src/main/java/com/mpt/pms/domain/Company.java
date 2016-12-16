@@ -2,9 +2,10 @@ package com.mpt.pms.domain;
 
 import com.mpt.pms.domain.exceptions.AssignmentException;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Company extends ModelBase{
+public class Company implements Serializable {
     private String name;
     private Date foundationDate;
     private List<Employee> employees;
